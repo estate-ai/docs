@@ -4,6 +4,7 @@
 assets\archtect
 assets\erd
 assets\proto
+assets\aiagent\image.png
 
-아키텍처, ERD, 와이어프레임 등의 이미지는 위 주소에 있습니다.
+아키텍처, ERD, 와이어프레임, AI 에이전트 하네스 등의 이미지는 위 주소에 있습니다.
 ERD는 ERD2.html 를 토대로 캡처하였읍니다.
