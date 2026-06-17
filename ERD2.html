@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estate AI - Interactive ERD Canvas</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Light Mode Premium Palette */
+            --bg-base: #f1f5f9;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --bg-panel: #ffffff;
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            
+            /* Curated Accent Colors */
+            --accent: #4f46e5;         /* Indigo */
+            --accent-light: #e0e7ff;
+            --accent-hover: #4338ca;
+            
+            --teal: #0d9488;           /* Teal */
+            --teal-light: #ccfbf1;
+            
+            --amber: #d97706;          /* Amber */
+            --amber-light: #fef3c7;
+            
+            --emerald: #059669;        /* Emerald */
+            --emerald-light: #d1fae5;
+            
+            --rose: #e11d48;           /* Rose */
+            --rose-light: #ffe4e6;
+            
+            --violet: #7c3aed;         /* Violet */
+            --violet-light: #ede9fe;
+            
+            --sky: #0284c7;            /* Sky */
+            --sky-light: #e0f2fe;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --shadow-premium: 0 20px 25px -5px rgba(79, 70, 229, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+            
+            --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.5;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header Navigation */
+        .top-navbar {
+            height: 64px;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            z-index: 20;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--violet));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-family: var(--font-display);
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-badge {
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .navbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Button styling */
+        .btn {
+            background-color: white;
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .btn:hover {
+            background-color: #f8fafc;
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+            color: white;
+        }
+
+        /* App Container Layout */
+        .app-body {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Control Sidebar */
+        .sidebar {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-sans);
+            font-size: 0.875rem;
+            outline: none;
+            transition: var(--transition-smooth);
+            background-color: #f8fafc;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+            background-color: white;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            width: 16px;
+            height: 16px;
+        }
+
+        .nav-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-top: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.55rem 0.75rem;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background-color: #f8fafc;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .nav-badge {
+            font-size: 0.7rem;
+            background-color: var(--border);
+            color: var(--text-secondary);
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item.active .nav-badge {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Color bar markers for categories */
+        .color-marker {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        /* Main Infinite Canvas area */
+        .canvas-container {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            background-color: #f8fafc;
+            /* Figma style grid pattern */
+            background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
+            background-size: 24px 24px;
+            user-select: none;
+            cursor: grab;
+        }
+
+        .canvas-container:active {
+            cursor: grabbing;
+        }
+
+        .canvas-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 6800px;
+            height: 2800px;
+            transform-origin: 0 0;
+            pointer-events: none; /* Let drag events fall through unless targeted */
+        }
+
+        /* SVG Connections overlay */
+        .connections-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto; /* Allow line click highlights */
+            z-index: 1;
+        }
+
+        .connection-line {
+            stroke: #94a3b8;
+            stroke-width: 1.5px;
+            transition: stroke 0.2s, stroke-width 0.2s, opacity 0.2s;
+            cursor: pointer;
+            opacity: 0.65;
+        }
+
+        .connection-line:hover {
+            stroke: var(--accent) !important;
+            stroke-width: 3px !important;
+            opacity: 1 !important;
+        }
+
+        .connection-line.highlight {
+            stroke: var(--accent) !important;
+            stroke-width: 3px !important;
+            opacity: 1 !important;
+            filter: drop-shadow(0 2px 4px rgba(79,70,229,0.3));
+        }
+
+        .connection-line.dimmed {
+            opacity: 0.08 !important;
+        }
+
+        /* Interactive Database Table Cards */
+        .table-card {
+            position: absolute;
+            width: 280px;
+            background-color: var(--bg-card);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s, transform 0.2s;
+            pointer-events: auto; /* React to clicks */
+            z-index: 5;
+            cursor: pointer;
+        }
+
+        .table-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .table-card.selected {
+            border-color: var(--accent) !important;
+            box-shadow: var(--shadow-premium);
+            z-index: 8;
+        }
+
+        .table-card.dimmed {
+            opacity: 0.18;
+        }
+
+        .table-card.highlight-search {
+            border-color: var(--amber);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.3);
+            z-index: 9;
+        }
+
+        .card-category-indicator {
+            height: 5px;
+            width: 100%;
+        }
+
+        .card-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(248, 250, 252, 0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .card-title-java {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-title-db {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .card-columns-list {
+            padding: 0.5rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-column-row {
+            padding: 0.3rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            border-bottom: 1px solid rgba(241, 245, 249, 0.5);
+            transition: background-color 0.15s;
+        }
+
+        .card-column-row:hover {
+            background-color: #f8fafc;
+        }
+
+        .card-col-left {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .card-col-name {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .card-key-icon {
+            font-size: 0.65rem;
+            font-weight: 800;
+            border-radius: 3px;
+            padding: 0.05rem 0.2rem;
+        }
+
+        .card-pk { background-color: var(--amber-light); color: var(--amber); border: 0.5px solid rgba(217, 119, 6, 0.3); }
+        .card-fk { background-color: var(--accent-light); color: var(--accent); border: 0.5px solid rgba(79, 70, 229, 0.3); }
+        .card-unique { background-color: var(--teal-light); color: var(--teal); border: 0.5px solid rgba(13, 148, 136, 0.3); }
+
+        .card-col-type {
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        /* Floating Inspector Panel (Right side) */
+        .inspector-panel {
+            width: 400px;
+            background-color: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            box-shadow: var(--shadow-lg);
+            position: absolute;
+            right: 0;
+            top: 0;
+            transform: translateX(100%);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .inspector-panel.open {
+            transform: translateX(0);
+            position: relative; /* Slide main content slightly if desired, or overlay */
+        }
+
+        .inspector-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(248, 250, 252, 0.8);
+            position: relative;
+        }
+
+        .close-inspector-btn {
+            position: absolute;
+            right: 1.25rem;
+            top: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition-smooth);
+        }
+
+        .close-inspector-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .inspector-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .inspector-sec-title {
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.25rem;
+        }
+
+        .inspector-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Inspector detailed columns table */
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            text-align: left;
+        }
+
+        .detail-table th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            background-color: #f8fafc;
+        }
+
+        .detail-table td {
+            padding: 0.6rem 0.5rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .detail-col-name {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .detail-col-type {
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        /* Code Block Panel */
+        .code-block-panel {
+            background-color: #0f172a;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            overflow-x: auto;
+            border: 1px solid #1e293b;
+        }
+
+        .code-snippet {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            white-space: pre;
+            line-height: 1.5;
+        }
+
+        .code-snippet .keyword { color: #f472b6; }
+        .code-snippet .annotation { color: #818cf8; }
+        .code-snippet .type { color: #60a5fa; }
+        .code-snippet .string { color: #34d399; }
+
+        /* Zoom floating indicator */
+        .zoom-overlay {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1rem;
+            box-shadow: var(--shadow-md);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            pointer-events: auto;
+        }
+
+        .zoom-btn-group {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .zoom-icon-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .zoom-icon-btn:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Flash Highlight animation */
+        @keyframes borderFlash {
+            0% {
+                border-color: var(--accent);
+                box-shadow: 0 0 0 6px var(--accent-light);
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .flash-card {
+            animation: borderFlash 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Category marker colors */
+        .color-auth { background-color: var(--accent); }
+        .color-dong { background-color: var(--teal); }
+        .color-brand { background-color: var(--amber); }
+        .color-recommend { background-color: var(--emerald); }
+        .color-saved { background-color: var(--violet); }
+        .color-rag { background-color: var(--rose); }
+        .color-report { background-color: var(--sky); }
+
+        /* Relationship direction indicators and cards text matching */
+        .rel-link {
+            color: var(--accent);
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .rel-link:hover {
+            color: var(--accent-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+        <div class="logo-container">
+            <div class="logo-icon">E</div>
+            <span class="logo-text">Estate AI ERD Explorer</span>
+            <span class="logo-badge">v2.0</span>
+        </div>
+        <div class="navbar-controls">
+            <button class="btn" onclick="fitToScreen()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                전체 화면에 맞춤
+            </button>
+            <button class="btn" onclick="resetZoomAndCenter()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                초기 중앙 배치
+            </button>
+            <button class="btn btn-primary" onclick="toggleLines()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 3l14 9-14 9V3z"/></svg>
+                관계선 토글
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <div class="app-body">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+            <!-- Search -->
+            <div class="search-container">
+                <input type="text" id="search-box" class="search-input" placeholder="테이블, 컬럼명, 설명 검색...">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            
+            <!-- Category Filtering -->
+            <div class="nav-sections">
+                <span class="nav-section-title">데이터 도메인</span>
+                <div class="nav-item active" data-category="all" onclick="filterCategory('all', this)">
+                    <div>
+                        <span class="color-marker" style="background-color: #64748b;"></span>
+                        <span>전체 테이블</span>
+                    </div>
+                    <span class="nav-badge" id="badge-all">39</span>
+                </div>
+                <div class="nav-item" data-category="auth" onclick="filterCategory('auth', this)">
+                    <div>
+                        <span class="color-marker color-auth"></span>
+                        <span>사용자 / 인증 / 온보딩</span>
+                    </div>
+                    <span class="nav-badge" id="badge-auth">6</span>
+                </div>
+                <div class="nav-item" data-category="dong" onclick="filterCategory('dong', this)">
+                    <div>
+                        <span class="color-marker color-dong"></span>
+                        <span>행정동 / 상권 / 기초</span>
+                    </div>
+                    <span class="nav-badge" id="badge-dong">7</span>
+                </div>
+                <div class="nav-item" data-category="brand" onclick="filterCategory('brand', this)">
+                    <div>
+                        <span class="color-marker color-brand"></span>
+                        <span>프랜차이즈 브랜드</span>
+                    </div>
+                    <span class="nav-badge" id="badge-brand">5</span>
+                </div>
+                <div class="nav-item" data-category="recommend" onclick="filterCategory('recommend', this)">
+                    <div>
+                        <span class="color-marker color-recommend"></span>
+                        <span>추천 / 점수 산정</span>
+                    </div>
+                    <span class="nav-badge" id="badge-recommend">6</span>
+                </div>
+                <div class="nav-item" data-category="saved" onclick="filterCategory('saved', this)">
+                    <div>
+                        <span class="color-marker color-saved"></span>
+                        <span>저장 관심 / 임베딩</span>
+                    </div>
+                    <span class="nav-badge" id="badge-saved">4</span>
+                </div>
+                <div class="nav-item" data-category="rag" onclick="filterCategory('rag', this)">
+                    <div>
+                        <span class="color-marker color-rag"></span>
+                        <span>AI / RAG / 채팅</span>
+                    </div>
+                    <span class="nav-badge" id="badge-rag">7</span>
+                </div>
+                <div class="nav-item" data-category="report" onclick="filterCategory('report', this)">
+                    <div>
+                        <span class="color-marker color-report"></span>
+                        <span>리포트 / 문서 / 일정</span>
+                    </div>
+                    <span class="nav-badge" id="badge-report">4</span>
+                </div>
+            </div>
+
+            <!-- Hint instructions -->
+            <div style="margin-top: auto; padding: 1rem; background-color: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border); font-size: 0.8rem; color: var(--text-secondary);">
+                <p style="font-weight: 600; margin-bottom: 0.25rem;">캔버스 조작 팁:</p>
+                <ul style="list-style-type: none; display: flex; flex-direction: column; gap: 0.25rem; padding-left: 0.25rem;">
+                    <li>🎯 드래그로 화면을 <b>이동(Pan)</b>합니다.</li>
+                    <li>🔍 마우스 휠로 <b>확대/축소(Zoom)</b>합니다.</li>
+                    <li>💡 테이블을 클릭하면 상세 속성과 JPA 코드가 우측 패널에 표시됩니다.</li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Interactive Canvas Area -->
+        <main class="canvas-container" id="canvas-container">
+            <div class="canvas-content" id="canvas-content">
+                <!-- SVG layer for lines -->
+                <svg class="connections-svg" id="relations-svg"></svg>
+                
+                <!-- Table cards will be rendered dynamically here via Javascript -->
+                <div id="cards-rendering-area"></div>
+            </div>
+            
+            <!-- Zoom Overlay indicators -->
+            <div class="zoom-overlay">
+                <span>배율: <strong id="zoom-text">60%</strong></span>
+                <div class="zoom-btn-group">
+                    <button class="zoom-icon-btn" onclick="zoomCanvas(0.9)">-</button>
+                    <button class="zoom-icon-btn" onclick="zoomCanvas(1.1)">+</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Side Slide-out Inspector Panel -->
+        <aside class="inspector-panel" id="inspector-panel">
+            <div class="inspector-header">
+                <button class="close-inspector-btn" onclick="closeInspector()">&times;</button>
+                <span class="domain-tag" id="inspect-tag" style="display: inline-block; margin-bottom: 0.5rem;">도메인</span>
+                <h2 id="inspect-java-name" style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">TableJavaName</h2>
+                <div id="inspect-db-name" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.1rem;">table_db_name</div>
+            </div>
+            <div class="inspector-body">
+                <!-- Description -->
+                <div>
+                    <h3 class="inspector-sec-title">테이블 설명</h3>
+                    <p class="inspector-desc" id="inspect-desc">테이블 설명이 노출됩니다.</p>
+                </div>
+
+                <!-- Columns Detail -->
+                <div>
+                    <h3 class="inspector-sec-title">상세 컬럼 명세</h3>
+                    <table class="detail-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%;">컬럼명</th>
+                                <th style="width: 25%;">타입</th>
+                                <th style="width: 40%;">설명 및 제약조건</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inspect-columns-body">
+                            <!-- columns will be dynamically written -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Relationships -->
+                <div>
+                    <h3 class="inspector-sec-title">연관 관계 (References)</h3>
+                    <div id="inspect-relations-body" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-secondary);">
+                        <!-- relations list will be dynamically written -->
+                    </div>
+                </div>
+
+                <!-- Java JPA Code -->
+                <div>
+                    <h3 class="inspector-sec-title">Java JPA Entity</h3>
+                    <div class="code-block-panel">
+                        <pre class="code-snippet" id="inspect-code">Code text</pre>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Data script -->
+    <script>
+        // Full database table schema specification (39 tables)
+        const tablesData = [
+            // Category: auth (6 tables)
+            {
+                id: "USER",
+                name: "User",
+                dbName: "users",
+                category: "auth",
+                desc: "기본 사용자 계정 정보를 관리합니다.",
+                x: 250, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "사용자 고유식별 번호 (자동증가)" },
+                    { name: "email", type: "String", key: "unique", constraints: "NOT NULL", desc: "사용자 이메일 (로그인 ID 겸용)" },
+                    { name: "nickname", type: "String", key: "", constraints: "", desc: "닉네임 / 이름" },
+                    { name: "role", type: "UserRole", key: "", constraints: "DEFAULT = USER", desc: "권한 등급 (USER, ADMIN)" },
+                    { name: "active", type: "Boolean", key: "", constraints: "DEFAULT = true", desc: "활성화 상태 여부" }
+                ],
+                code: `@Entity\n@Table(name = "users")\npublic class User extends BaseEntity {\n    @Column(nullable = false, unique = true)\n    private String email;\n    private String nickname;\n    @Enumerated(EnumType.STRING)\n    private UserRole role = UserRole.USER;\n    private Boolean active = true;\n}`
+            },
+            {
+                id: "OAUTH-ACCOUNT",
+                name: "OAuthAccount",
+                dbName: "oauth_accounts",
+                category: "auth",
+                desc: "소셜 연동 계정 정보 (Google, Kakao, Naver)를 관리합니다.",
+                x: 150, y: 450,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "대상 사용자 정보 참조" },
+                    { name: "provider", type: "OAuthProvider", key: "", constraints: "", desc: "인증 공급자 (GOOGLE, KAKAO, NAVER)" },
+                    { name: "providerUserId", type: "String", key: "", constraints: "NOT NULL", desc: "OAuth 공급자측 유저 식별 코드" },
+                    { name: "providerEmail", type: "String", key: "", constraints: "", desc: "OAuth 공급자측 제공 이메일" }
+                ],
+                code: `@Entity\n@Table(name = "oauth_accounts")\npublic class OAuthAccount extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    @Enumerated(EnumType.STRING)\n    private OAuthProvider provider;\n    @Column(nullable = false)\n    private String providerUserId;\n    private String providerEmail;\n}`
+            },
+            {
+                id: "USER-PROFILE",
+                name: "UserProfile",
+                dbName: "user_profiles",
+                category: "auth",
+                desc: "사용자의 기초 프로필 및 맞춤 추천을 위한 조건(예산, 타깃 등)을 저장합니다.",
+                x: 600, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "UNIQUE, users.id", desc: "대상 사용자 정보 참조 (1:1)" },
+                    { name: "birthYear", type: "Integer", key: "", constraints: "", desc: "출생연도" },
+                    { name: "gender", type: "Gender", key: "", constraints: "", desc: "성별 (MALE, FEMALE, UNKNOWN)" },
+                    { name: "occupation", type: "String", key: "", constraints: "", desc: "직업 / 업종" },
+                    { name: "startupBudget", type: "Integer", key: "", constraints: "", desc: "창업 가용 예산" },
+                    { name: "preferredRegion", type: "String", key: "", constraints: "", desc: "희망 지역" },
+                    { name: "preferredOperationType", type: "String", key: "", constraints: "", desc: "희망 운영 방식" },
+                    { name: "riskPreference", type: "String", key: "", constraints: "", desc: "위험 선호도" },
+                    { name: "personaLabel", type: "String", key: "", constraints: "", desc: "페르소나 분류 라벨" }
+                ],
+                code: `@Entity\n@Table(name = "user_profiles")\npublic class UserProfile extends BaseEntity {\n    @OneToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id", unique = true)\n    private User user;\n    private Integer birthYear;\n    @Enumerated(EnumType.STRING)\n    private Gender gender;\n    private String occupation;\n    private Integer startupBudget;\n    private String preferredRegion;\n    private String preferredOperationType;\n    private String riskPreference;\n    private String personaLabel;\n}`
+            },
+            {
+                id: "ONBOARDING-SESSION",
+                name: "OnboardingSession",
+                dbName: "onboarding_sessions",
+                category: "auth",
+                desc: "사용자의 온보딩 설문 제출 세션을 기록합니다.",
+                x: 600, y: 530,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "참가 사용자 참조" },
+                    { name: "completed", type: "Boolean", key: "", constraints: "DEFAULT = false", desc: "설문 전체 완료 여부" },
+                    { name: "completedAt", type: "LocalDateTime", key: "", constraints: "", desc: "설문 완료 시점" }
+                ],
+                code: `@Entity\n@Table(name = "onboarding_sessions")\npublic class OnboardingSession extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    private Boolean completed = false;\n    private LocalDateTime completedAt;\n}`
+            },
+            {
+                id: "ONBOARDING-QUESTION",
+                name: "OnboardingQuestion",
+                dbName: "onboarding_questions",
+                category: "auth",
+                desc: "온보딩용 설문 문항(질문) 정보를 관리합니다.",
+                x: 1000, y: 830,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "질문 번호" },
+                    { name: "questionKey", type: "String", key: "", constraints: "NOT NULL", desc: "시스템 식별용 키" },
+                    { name: "questionText", type: "String", key: "", constraints: "NOT NULL", desc: "질문 본문 내용" },
+                    { name: "displayOrder", type: "Integer", key: "", constraints: "", desc: "설문 노출 순서" },
+                    { name: "active", type: "Boolean", key: "", constraints: "DEFAULT = true", desc: "질문 활성화 상태" }
+                ],
+                code: `@Entity\n@Table(name = "onboarding_questions")\npublic class OnboardingQuestion extends BaseEntity {\n    @Column(nullable = false)\n    private String questionKey;\n    @Column(nullable = false)\n    private String questionText;\n    private Integer displayOrder;\n    private Boolean active = true;\n}`
+            },
+            {
+                id: "ONBOARDING-ANSWER",
+                name: "OnboardingAnswer",
+                dbName: "onboarding_answers",
+                category: "auth",
+                desc: "특정 온보딩 세션의 질문별 사용자 응답 데이터를 저장합니다.",
+                x: 600, y: 830,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "session_id", type: "Long", key: "fk", constraints: "onboarding_sessions.id", desc: "참조 온보딩 세션" },
+                    { name: "question_id", type: "Long", key: "fk", constraints: "onboarding_questions.id", desc: "참조 질문" },
+                    { name: "answerText", type: "String", key: "", constraints: "", desc: "텍스트 답변" },
+                    { name: "answerJson", type: "String (jsonb)", key: "", constraints: "", desc: "다중선택형 복합 데이터 JSON" }
+                ],
+                code: `@Entity\n@Table(name = "onboarding_answers")\npublic class OnboardingAnswer extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "session_id")\n    private OnboardingSession session;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "question_id")\n    private OnboardingQuestion question;\n    @Column(columnDefinition = "text")\n    private String answerText;\n    @Column(columnDefinition = "jsonb")\n    private String answerJson;\n}`
+            },
+
+            // Category: dong (7 tables)
+            {
+                id: "ADMIN-DONG",
+                name: "AdminDong",
+                dbName: "admin_dongs",
+                category: "dong",
+                desc: "행정동 단위 지리 데이터 및 코드 관리 (공간 분석 기초)",
+                x: 1800, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "행정동 식별번호" },
+                    { name: "sido", type: "String", key: "", constraints: "NOT NULL", desc: "시/도명" },
+                    { name: "sigungu", type: "String", key: "", constraints: "NOT NULL", desc: "시/군/구명" },
+                    { name: "dongName", type: "String", key: "", constraints: "NOT NULL", desc: "행정동명" },
+                    { name: "adminDongCode", type: "String", key: "unique", constraints: "NOT NULL", desc: "행정동 코드 (10자리)" },
+                    { name: "boundary", type: "Geometry", key: "", constraints: "MultiPolygon, 4326", desc: "행정동 경계 지오메트리" },
+                    { name: "centerPoint", type: "Point", key: "", constraints: "Point, 4326", desc: "행정동 중심점 좌표" }
+                ],
+                code: `@Entity\n@Table(name = "admin_dongs")\npublic class AdminDong extends BaseEntity {\n    private String sido;\n    private String sigungu;\n    private String dongName;\n    @Column(nullable = false, unique = true)\n    private String adminDongCode;\n    @Column(columnDefinition = "geometry(MultiPolygon,4326)")\n    private Geometry boundary;\n    @Column(columnDefinition = "geometry(Point,4326)")\n    private Point centerPoint;\n}`
+            },
+            {
+                id: "DATA-SOURCE",
+                name: "DataSource",
+                dbName: "data_sources",
+                category: "dong",
+                desc: "상권, 인구, 프랜차이즈 공공 데이터의 수집 출처를 추적합니다.",
+                x: 2250, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "출처 코드" },
+                    { name: "name", type: "String", key: "", constraints: "NOT NULL", desc: "출처명" },
+                    { name: "provider", type: "String", key: "", constraints: "", desc: "제공 기관" },
+                    { name: "sourceUrl", type: "String", key: "", constraints: "", desc: "데이터 취득 API 주소" },
+                    { name: "collectedDate", type: "LocalDate", key: "", constraints: "", desc: "수집 수행일자" },
+                    { name: "baseDate", type: "LocalDate", key: "", constraints: "", desc: "공공 데이터의 기준 일자" },
+                    { name: "description", type: "String", key: "", constraints: "", desc: "데이터 성격 설명" }
+                ],
+                code: `@Entity\n@Table(name = "data_sources")\npublic class DataSource extends BaseEntity {\n    @Column(nullable = false)\n    private String name;\n    private String provider;\n    private String sourceUrl;\n    private LocalDate collectedDate;\n    private LocalDate baseDate;\n    @Column(columnDefinition = "text")\n    private String description;\n}`
+            },
+            {
+                id: "METRIC-PERIOD",
+                name: "MetricPeriod",
+                dbName: "metric_periods",
+                category: "dong",
+                desc: "매출, 유동인구 등의 분석 대상이 되는 기간(연도, 분기, 월)을 지정합니다.",
+                x: 2700, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "기간 코드" },
+                    { name: "year", type: "Integer", key: "", constraints: "", desc: "연도" },
+                    { name: "quarter", type: "Integer", key: "", constraints: "", desc: "분기 (1~4)" },
+                    { name: "month", type: "Integer", key: "", constraints: "", desc: "월" },
+                    { name: "startDate", type: "LocalDate", key: "", constraints: "", desc: "시작 날짜" },
+                    { name: "endDate", type: "LocalDate", key: "", constraints: "", desc: "종료 날짜" }
+                ],
+                code: `@Entity\n@Table(name = "metric_periods")\npublic class MetricPeriod extends BaseEntity {\n    private Integer year;\n    private Integer quarter;\n    private Integer month;\n    private LocalDate startDate;\n    private LocalDate endDate;\n}`
+            },
+            {
+                id: "INDUSTRY",
+                name: "Industry",
+                dbName: "industries",
+                category: "dong",
+                desc: "상가 업종 표준화 코드 및 카테고리를 분류합니다.",
+                x: 1800, y: 500,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "업종 식별번호" },
+                    { name: "name", type: "String", key: "", constraints: "NOT NULL", desc: "업종명" },
+                    { name: "industryCode", type: "String", key: "", constraints: "", desc: "산업 코드 (소분류)" },
+                    { name: "parentCategory", type: "String", key: "", constraints: "", desc: "상위 카테고리" },
+                    { name: "description", type: "String", key: "", constraints: "", desc: "업종 특성 설명" }
+                ],
+                code: `@Entity\n@Table(name = "industries")\npublic class Industry extends BaseEntity {\n    @Column(nullable = false)\n    private String name;\n    private String industryCode;\n    private String parentCategory;\n    @Column(columnDefinition = "text")\n    private String description;\n}`
+            },
+            {
+                id: "COMMERCIAL-METRIC",
+                name: "CommercialMetric",
+                dbName: "commercial_metrics",
+                category: "dong",
+                desc: "매출, 유동인구, 임대료 등 서울시 행정동별 핵심 상권 통계 수치를 수집 및 매핑합니다.",
+                x: 2250, y: 500,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "지표 번호" },
+                    { name: "admin_dong_id", type: "Long", key: "fk", constraints: "admin_dongs.id", desc: "대상 행정동 참조" },
+                    { name: "industry_id", type: "Long", key: "fk", constraints: "industries.id", desc: "대상 업종 참조 (선택)" },
+                    { name: "period_id", type: "Long", key: "fk", constraints: "metric_periods.id", desc: "대상 분기/기간 참조" },
+                    { name: "data_source_id", type: "Long", key: "fk", constraints: "data_sources.id", desc: "데이터 원본 참조" },
+                    { name: "metricType", type: "MetricType", key: "", constraints: "", desc: "지표 유형 (ESTIMATED_SALES, RENT 등)" },
+                    { name: "gender", type: "Gender", key: "", constraints: "", desc: "성별 구분" },
+                    { name: "ageGroup", type: "AgeGroup", key: "", constraints: "", desc: "연령대 구분" },
+                    { name: "dayType", type: "DayType", key: "", constraints: "", desc: "요일 구분 (주중/주말)" },
+                    { name: "timeSlot", type: "TimeSlot", key: "", constraints: "", desc: "시간대 슬롯" },
+                    { name: "value", type: "BigDecimal", key: "", constraints: "", desc: "통계 수치 결과값" },
+                    { name: "unit", type: "String", key: "", constraints: "", desc: "단위" }
+                ],
+                code: `@Entity\n@Table(name = "commercial_metrics")\npublic class CommercialMetric extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "admin_dong_id")\n    private AdminDong adminDong;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "industry_id")\n    private Industry industry;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "period_id")\n    private MetricPeriod period;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "data_source_id")\n    private DataSource dataSource;\n    @Enumerated(EnumType.STRING)\n    private MetricType metricType;\n    @Enumerated(EnumType.STRING)\n    private Gender gender;\n    @Enumerated(EnumType.STRING)\n    private AgeGroup ageGroup;\n    @Enumerated(EnumType.STRING)\n    private DayType dayType;\n    @Enumerated(EnumType.STRING)\n    private TimeSlot timeSlot;\n    private BigDecimal value;\n    private String unit;\n}`
+            },
+            {
+                id: "FACILITY",
+                name: "Facility",
+                dbName: "facilities",
+                category: "dong",
+                desc: "지하철역, 대학교, 병원, 관공서 등 주요 집객시설의 지리 위치를 수집합니다.",
+                x: 1350, y: 500,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "시설 식별 번호" },
+                    { name: "admin_dong_id", type: "Long", key: "fk", constraints: "admin_dongs.id", desc: "소속 행정동 참조" },
+                    { name: "facilityType", type: "String", key: "", constraints: "", desc: "시설 구분 (SUBWAY, UNIV 등)" },
+                    { name: "facilityName", type: "String", key: "", constraints: "", desc: "시설 명칭" },
+                    { name: "location", type: "Point", key: "", constraints: "Point, 4326", desc: "공간 포인트 (PostGIS)" }
+                ],
+                code: `@Entity\n@Table(name = "facilities")\npublic class Facility extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "admin_dong_id")\n    private AdminDong adminDong;\n    private String facilityType;\n    private String facilityName;\n    @Column(columnDefinition = "geometry(Point,4326)")\n    private Point location;\n}`
+            },
+            {
+                id: "STORE",
+                name: "Store",
+                dbName: "stores",
+                category: "dong",
+                desc: "경쟁 강도 및 매장 밀도를 확인하기 위한 서울 개별 점포 현황 정보입니다.",
+                x: 1350, y: 800,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "점포 식별 번호" },
+                    { name: "admin_dong_id", type: "Long", key: "fk", constraints: "admin_dongs.id", desc: "소속 행정동" },
+                    { name: "industry_id", type: "Long", key: "fk", constraints: "industries.id", desc: "점포 업종 참조" },
+                    { name: "storeName", type: "String", key: "", constraints: "", desc: "가게 상호명" },
+                    { name: "franchiseStore", type: "Boolean", key: "", constraints: "", desc: "프랜차이즈 가맹점 여부" },
+                    { name: "location", type: "Point", key: "", constraints: "Point, 4326", desc: "점포 지리적 위경도 위치" }
+                ],
+                code: `@Entity\n@Table(name = "stores")\npublic class Store extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "admin_dong_id")\n    private AdminDong adminDong;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "industry_id")\n    private Industry industry;\n    private String storeName;\n    private Boolean franchiseStore;\n    @Column(columnDefinition = "geometry(Point,4326)")\n    private Point location;\n}`
+            },
+
+            // Category: brand (5 tables)
+            {
+                id: "FRANCHISE-BRAND",
+                name: "FranchiseBrand",
+                dbName: "franchise_brands",
+                category: "brand",
+                desc: "프랜차이즈 가맹점 브랜드 마스터 정보를 관리합니다.",
+                x: 2250, y: 1000,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "브랜드 고유키" },
+                    { name: "brandName", type: "String", key: "", constraints: "NOT NULL", desc: "브랜드명" },
+                    { name: "companyName", type: "String", key: "", constraints: "", desc: "가맹 본사 법인명" },
+                    { name: "industry_id", type: "Long", key: "fk", constraints: "industries.id", desc: "카테고리 업종 참조" },
+                    { name: "description", type: "String", key: "", constraints: "", desc: "브랜드 소개 글" },
+                    { name: "operationType", type: "String", key: "", constraints: "", desc: "운영 스타일" },
+                    { name: "active", type: "Boolean", key: "", constraints: "DEFAULT = true", desc: "사용 여부" }
+                ],
+                code: `@Entity\n@Table(name = "franchise_brands")\npublic class FranchiseBrand extends BaseEntity {\n    @Column(nullable = false)\n    private String brandName;\n    private String companyName;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "industry_id")\n    private Industry industry;\n    @Column(columnDefinition = "text")\n    private String description;\n    private String operationType;\n    private Boolean active = true;\n}`
+            },
+            {
+                id: "FRANCHISE-STARTUP-COST",
+                name: "FranchiseStartupCost",
+                dbName: "franchise_startup_costs",
+                category: "brand",
+                desc: "가맹 가입부터 개점까지 필요한 세부 창업 비용 정보입니다.",
+                x: 1800, y: 1000,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "brand_id", type: "Long", key: "fk", constraints: "franchise_brands.id", desc: "대상 브랜드 참조" },
+                    { name: "franchiseFee", type: "BigDecimal", key: "", constraints: "", desc: "가맹비" },
+                    { name: "educationFee", type: "BigDecimal", key: "", constraints: "", desc: "순수 교육비" },
+                    { name: "deposit", type: "BigDecimal", key: "", constraints: "", desc: "보증금" },
+                    { name: "interiorCost", type: "BigDecimal", key: "", constraints: "", desc: "인테리어 시공 총 비용" },
+                    { name: "otherCost", type: "BigDecimal", key: "", constraints: "", desc: "기타 설비 비용" },
+                    { name: "totalCost", type: "BigDecimal", key: "", constraints: "", desc: "합계 창업 예산" },
+                    { name: "costUnit", type: "String", key: "", constraints: "", desc: "금액 단위 (예: 원)" }
+                ],
+                code: `@Entity\n@Table(name = "franchise_startup_costs")\npublic class FranchiseStartupCost extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "brand_id")\n    private FranchiseBrand brand;\n    private BigDecimal franchiseFee;\n    private BigDecimal educationFee;\n    private BigDecimal deposit;\n    private BigDecimal interiorCost;\n    private BigDecimal otherCost;\n    private BigDecimal totalCost;\n    private String costUnit;\n}`
+            },
+            {
+                id: "FRANCHISE-SALES-STAT",
+                name: "FranchiseSalesStat",
+                dbName: "franchise_sales_stats",
+                category: "brand",
+                desc: "정보공개서에 기반한 연간 매출 통계 및 점포수 데이터를 기간별로 관리합니다.",
+                x: 2700, y: 1000,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "통계 식별번호" },
+                    { name: "brand_id", type: "Long", key: "fk", constraints: "franchise_brands.id", desc: "대상 브랜드 참조" },
+                    { name: "period_id", type: "Long", key: "fk", constraints: "metric_periods.id", desc: "적용 기간 참조" },
+                    { name: "averageSales", type: "BigDecimal", key: "", constraints: "", desc: "가맹점 전체 연간 평균 매출" },
+                    { name: "salesPerArea", type: "BigDecimal", key: "", constraints: "", desc: "평당 평균 매출액" },
+                    { name: "storeCount", type: "Integer", key: "", constraints: "", desc: "가맹 점포수" },
+                    { name: "regionName", type: "String", key: "", constraints: "", desc: "지역명 (예: 서울)" }
+                ],
+                code: `@Entity\n@Table(name = "franchise_sales_stats")\npublic class FranchiseSalesStat extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "brand_id")\n    private FranchiseBrand brand;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "period_id")\n    private MetricPeriod period;\n    private BigDecimal averageSales;\n    private BigDecimal salesPerArea;\n    private Integer storeCount;\n    private String regionName;\n}`
+            },
+            {
+                id: "FRANCHISE-DISCLOSURE",
+                name: "FranchiseDisclosure",
+                dbName: "franchise_disclosures",
+                category: "brand",
+                desc: "공정거래위원회에 공식 등록된 정보공개서 문서 메타데이터 정보입니다.",
+                x: 2250, y: 1380,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "brand_id", type: "Long", key: "fk", constraints: "franchise_brands.id", desc: "대상 브랜드 참조" },
+                    { name: "disclosureNumber", type: "String", key: "", constraints: "", desc: "정보공개서 등록 번호" },
+                    { name: "registeredDate", type: "LocalDate", key: "", constraints: "", desc: "정보공개서 등록 승인일" },
+                    { name: "disclosureUrl", type: "String", key: "", constraints: "", desc: "공정위 웹사이트 조회용 URL" },
+                    { name: "data_source_id", type: "Long", key: "fk", constraints: "data_sources.id", desc: "데이터 출처 연동 키" }
+                ],
+                code: `@Entity\n@Table(name = "franchise_disclosures")\npublic class FranchiseDisclosure extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "brand_id")\n    private FranchiseBrand brand;\n    private String disclosureNumber;\n    private LocalDate registeredDate;\n    private String disclosureUrl;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "data_source_id")\n    private DataSource dataSource;\n}`
+            },
+            {
+                id: "FRANCHISE-POST",
+                name: "FranchisePost",
+                dbName: "franchise_posts",
+                category: "brand",
+                desc: "프랜차이즈 소개, 인테리어 갤러리 및 홍보 콘텐츠 게시글 데이터입니다.",
+                x: 1800, y: 1380,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "게시글 번호" },
+                    { name: "brand_id", type: "Long", key: "fk", constraints: "franchise_brands.id", desc: "대응 브랜드 참조" },
+                    { name: "title", type: "String", key: "", constraints: "", desc: "게시글 제목" },
+                    { name: "content", type: "String (text)", key: "", constraints: "", desc: "소개글 본문 (Markdown)" },
+                    { name: "thumbnailUrl", type: "String", key: "", constraints: "", desc: "대표 이미지 주소" },
+                    { name: "published", type: "Boolean", key: "", constraints: "DEFAULT = true", desc: "활성 공개 여부" }
+                ],
+                code: `@Entity\n@Table(name = "franchise_posts")\npublic class FranchisePost extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "brand_id")\n    private FranchiseBrand brand;\n    private String title;\n    @Column(columnDefinition = "text")\n    private String content;\n    private String thumbnailUrl;\n    private Boolean published = true;\n}`
+            },
+
+            // Category: recommend (6 tables)
+            {
+                id: "RECOMMENDATION-REQUEST",
+                name: "RecommendationRequest",
+                dbName: "recommendation_requests",
+                category: "recommend",
+                desc: "사용자의 맞춤 추천 요청 히스토리 및 조건을 영구 저장합니다.",
+                x: 3400, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "요청 번호" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "요청한 사용자 참조" },
+                    { name: "budget", type: "Integer", key: "", constraints: "", desc: "입력 예산 범위" },
+                    { name: "targetRegion", type: "String", key: "", constraints: "", desc: "희망 구/동 명칭" },
+                    { name: "targetCustomer", type: "String", key: "", constraints: "", desc: "주요 대상 고객층" },
+                    { name: "preferredIndustry", type: "String", key: "", constraints: "", desc: "희망 업종 키워드" },
+                    { name: "operationType", type: "String", key: "", constraints: "", desc: "운영 조건" },
+                    { name: "riskPreference", type: "String", key: "", constraints: "", desc: "위험 선호 지표" },
+                    { name: "rawConditionJson", type: "String (jsonb)", key: "", constraints: "", desc: "입력 파라미터 원본 JSON" }
+                ],
+                code: `@Entity\n@Table(name = "recommendation_requests")\npublic class RecommendationRequest extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    private Integer budget;\n    private String targetRegion;\n    private String targetCustomer;\n    private String preferredIndustry;\n    private String operationType;\n    private String riskPreference;\n    @Column(columnDefinition = "jsonb")\n    private String rawConditionJson;\n}`
+            },
+            {
+                id: "RECOMMENDATION-RESULT",
+                name: "RecommendationResult",
+                dbName: "recommendation_results",
+                category: "recommend",
+                desc: "생성된 상권 × 업종 × 브랜드 추천 조합 결과(TOP 3 등)를 보관합니다.",
+                x: 3400, y: 600,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "결과 번호" },
+                    { name: "request_id", type: "Long", key: "fk", constraints: "recommendation_requests.id", desc: "원본 추천 요청 정보" },
+                    { name: "admin_dong_id", type: "Long", key: "fk", constraints: "admin_dongs.id", desc: "추천 선정 행정동" },
+                    { name: "industry_id", type: "Long", key: "fk", constraints: "industries.id", desc: "추천 선정 업종" },
+                    { name: "brand_id", type: "Long", key: "fk", constraints: "franchise_brands.id", desc: "추천 선정 브랜드" },
+                    { name: "rankOrder", type: "Integer", key: "", constraints: "", desc: "노출 순위 (1~3위)" },
+                    { name: "totalScore", type: "BigDecimal", key: "", constraints: "", desc: "종합 추천 계산 점수" },
+                    { name: "summaryReason", type: "String", key: "", constraints: "", desc: "간략한 추천 사유" },
+                    { name: "riskSummary", type: "String", key: "", constraints: "", desc: "주의해야 할 리스크 요약" }
+                ],
+                code: `@Entity\n@Table(name = "recommendation_results")\npublic class RecommendationResult extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "request_id")\n    private RecommendationRequest request;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "admin_dong_id")\n    private AdminDong adminDong;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "industry_id")\n    private Industry industry;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "brand_id")\n    private FranchiseBrand brand;\n    private Integer rankOrder;\n    private BigDecimal totalScore;\n    @Column(columnDefinition = "text")\n    private String summaryReason;\n    @Column(columnDefinition = "text")\n    private String riskSummary;\n}`
+            },
+            {
+                id: "RECOMMENDATION-SCORE-ITEM",
+                name: "RecommendationScoreItem",
+                dbName: "recommendation_score_items",
+                category: "recommend",
+                desc: "추천 결과의 세부 지표별 점수, 가중치 및 도출 판단 근거(Evidence)를 설명합니다.",
+                x: 3400, y: 1100,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "result_id", type: "Long", key: "fk", constraints: "recommendation_results.id", desc: "연관 최종 추천 결과" },
+                    { name: "scoreType", type: "String", key: "", constraints: "", desc: "지표 구분 유형" },
+                    { name: "score", type: "BigDecimal", key: "", constraints: "", desc: "해당 지표 개별 점수" },
+                    { name: "weight", type: "BigDecimal", key: "", constraints: "", desc: "지표 가중치 비중" },
+                    { name: "evidenceText", type: "String", key: "", constraints: "", desc: "점수 부여 근거 데이터" }
+                ],
+                code: `@Entity\n@Table(name = "recommendation_score_items")\npublic class RecommendationScoreItem extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "result_id")\n    private RecommendationResult result;\n    private String scoreType;\n    private BigDecimal score;\n    private BigDecimal weight;\n    @Column(columnDefinition = "text")\n    private String evidenceText;\n}`
+            },
+            {
+                id: "INDUSTRY-FIT-SCORE",
+                name: "IndustryFitScore",
+                dbName: "industry_fit_scores",
+                category: "recommend",
+                desc: "행정동별 각 업종의 적합도(진입성, 수요, 매출, 지속가능 등)를 미리 계산해두는 마스터 테이블입니다.",
+                x: 3950, y: 600,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "admin_dong_id", type: "Long", key: "fk", constraints: "admin_dongs.id", desc: "행정동 참조" },
+                    { name: "industry_id", type: "Long", key: "fk", constraints: "industries.id", desc: "업종 참조" },
+                    { name: "period_id", type: "Long", key: "fk", constraints: "metric_periods.id", desc: "기준이 되는 분기/연월 참조" },
+                    { name: "demandScore", type: "BigDecimal", key: "", constraints: "", desc: "수요 매력도 점수" },
+                    { name: "targetCustomerScore", type: "BigDecimal", key: "", constraints: "", desc: "타깃 고객 일치성 점수" },
+                    { name: "timeSlotScore", type: "BigDecimal", key: "", constraints: "", desc: "시간대 매핑 적합 점수" },
+                    { name: "competitionScore", type: "BigDecimal", key: "", constraints: "", desc: "경쟁 리스크 점수" },
+                    { name: "costScore", type: "BigDecimal", key: "", constraints: "", desc: "임대료 적절성 점수" },
+                    { name: "sustainabilityScore", type: "BigDecimal", key: "", constraints: "", desc: "영업 안정성 점수" },
+                    { name: "totalScore", type: "BigDecimal", key: "", constraints: "", desc: "총점 (가중치 계산 적용값)" }
+                ],
+                code: `@Entity\n@Table(name = "industry_fit_scores")\npublic class IndustryFitScore extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "admin_dong_id")\n    private AdminDong adminDong;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "industry_id")\n    private Industry industry;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "period_id")\n    private MetricPeriod period;\n    private BigDecimal demandScore;\n    private BigDecimal targetCustomerScore;\n    private BigDecimal timeSlotScore;\n    private BigDecimal competitionScore;\n    private BigDecimal costScore;\n    private BigDecimal sustainabilityScore;\n    private BigDecimal totalScore;\n}`
+            },
+            {
+                id: "INDUSTRY-WEIGHT-CONFIG",
+                name: "IndustryWeightConfig",
+                dbName: "industry_weight_configs",
+                category: "recommend",
+                desc: "업종 특성별(예: 오피스 밀접, 주거 밀접) 가중치 적용 설정입니다.",
+                x: 3950, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "설정 ID" },
+                    { name: "industry_id", type: "Long", key: "fk", constraints: "industries.id", desc: "대상 업종 참조" },
+                    { name: "demandWeight", type: "BigDecimal", key: "", constraints: "", desc: "수요 요소 가중치" },
+                    { name: "targetCustomerWeight", type: "BigDecimal", key: "", constraints: "", desc: "타깃 일치 가중치" },
+                    { name: "timeSlotWeight", type: "BigDecimal", key: "", constraints: "", desc: "주요 시간대 비중" },
+                    { name: "competitionWeight", type: "BigDecimal", key: "", constraints: "", desc: "경쟁 강도 가중치" },
+                    { name: "costWeight", type: "BigDecimal", key: "", constraints: "", desc: "임대료 가중치" },
+                    { name: "sustainabilityWeight", type: "BigDecimal", key: "", constraints: "", desc: "영업 지속성 판단 비중" },
+                    { name: "active", type: "Boolean", key: "", constraints: "DEFAULT = true", desc: "설정 사용 유효성" }
+                ],
+                code: `@Entity\n@Table(name = "industry_weight_configs")\npublic class IndustryWeightConfig extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "industry_id")\n    private Industry industry;\n    private BigDecimal demandWeight;\n    private BigDecimal targetCustomerWeight;\n    private BigDecimal timeSlotWeight;\n    private BigDecimal competitionWeight;\n    private BigDecimal costWeight;\n    private BigDecimal sustainabilityWeight;\n    private Boolean active = true;\n}`
+            },
+            {
+                id: "SAVED-RECOMMENDATION",
+                name: "SavedRecommendation",
+                dbName: "saved_recommendations",
+                category: "recommend",
+                desc: "사용자가 마음에 들어 보관함에 담은 최종 추천 조합을 관리합니다.",
+                x: 3950, y: 1100,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "보관 번호" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "소유주 사용자 참조" },
+                    { name: "recommendation_result_id", type: "Long", key: "fk", constraints: "recommendation_results.id", desc: "대상 추천 결과 참조" },
+                    { name: "memo", type: "String", key: "", constraints: "", desc: "사용자 작성 메모" }
+                ],
+                code: `@Entity\n@Table(name = "saved_recommendations")\npublic class SavedRecommendation extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "recommendation_result_id")\n    private RecommendationResult recommendationResult;\n    private String memo;\n}`
+            },
+
+            // Category: saved (4 tables)
+            {
+                id: "SAVED-ADMIN-DONG",
+                name: "SavedAdminDong",
+                dbName: "saved_admin_dongs",
+                category: "saved",
+                desc: "사용자가 즐겨찾기(관심 목록)에 추가한 행정동 정보를 보관합니다.",
+                x: 250, y: 1100,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "사용자 참조" },
+                    { name: "admin_dong_id", type: "Long", key: "fk", constraints: "admin_dongs.id", desc: "저장 행정동 참조" },
+                    { name: "memo", type: "String", key: "", constraints: "", desc: "개인 메모" }
+                ],
+                code: `@Entity\n@Table(name = "saved_admin_dongs")\npublic class SavedAdminDong extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "admin_dong_id")\n    private AdminDong adminDong;\n    private String memo;\n}`
+            },
+            {
+                id: "SAVED-FRANCHISE-BRAND",
+                name: "SavedFranchiseBrand",
+                dbName: "saved_franchise_brands",
+                category: "saved",
+                desc: "사용자가 즐겨찾기에 등록한 개별 브랜드 정보를 관리합니다.",
+                x: 250, y: 1400,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "사용자 참조" },
+                    { name: "brand_id", type: "Long", key: "fk", constraints: "franchise_brands.id", desc: "저장 프랜차이즈 브랜드 참조" },
+                    { name: "memo", type: "String", key: "", constraints: "", desc: "개인 메모" }
+                ],
+                code: `@Entity\n@Table(name = "saved_franchise_brands")\npublic class SavedFranchiseBrand extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "brand_id")\n    private FranchiseBrand brand;\n    private String memo;\n}`
+            },
+            {
+                id: "USER-PREFERENCE-VECTOR",
+                name: "UserPreferenceVector",
+                dbName: "user_preference_vectors",
+                category: "saved",
+                desc: "RAG 검색 및 추천 개인화를 위해 사용자 선호도를 담은 임베딩 벡터 데이터입니다 (PGVector 연동).",
+                x: 700, y: 1100,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 키" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "UNIQUE, users.id", desc: "대상 사용자 참조 (1:1)" },
+                    { name: "embedding", type: "String (vector(1536))", key: "", constraints: "", desc: "1536 차원의 선호도 벡터값" },
+                    { name: "modelName", type: "String", key: "", constraints: "", desc: "사용한 임베딩 모델명" },
+                    { name: "lastUpdatedAt", type: "LocalDateTime", key: "", constraints: "", desc: "마지막 벡터 갱신 일자" }
+                ],
+                code: `@Entity\n@Table(name = "user_preference_vectors")\npublic class UserPreferenceVector extends BaseEntity {\n    @OneToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id", unique = true)\n    private User user;\n    @Column(columnDefinition = "vector(1536)")\n    private String embedding;\n    private String modelName;\n    private LocalDateTime lastUpdatedAt;\n}`
+            },
+            {
+                id: "USER-PREFERENCE-TAG",
+                name: "UserPreferenceTag",
+                dbName: "user_preference_tags",
+                category: "saved",
+                desc: "사용자가 선호하는 관심 키워드 및 가중치를 태그 목록으로 관리합니다.",
+                x: 700, y: 1400,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "사용자 정보 참조" },
+                    { name: "tagName", type: "String", key: "", constraints: "", desc: "관심 태그명" },
+                    { name: "weight", type: "BigDecimal", key: "", constraints: "", desc: "관심 가중 비중 수치" }
+                ],
+                code: `@Entity\n@Table(name = "user_preference_tags")\npublic class UserPreferenceTag extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    private String tagName;\n    private BigDecimal weight;\n}`
+            },
+
+            // Category: rag (7 tables)
+            {
+                id: "RAG-DOCUMENT",
+                name: "RagDocument",
+                dbName: "rag_documents",
+                category: "rag",
+                desc: "RAG 임베딩 대상이 되는 공공 정보, 정부지원사업, 브랜드 분석 보고서 등 원천 문서 정보입니다.",
+                x: 4600, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "문서 식별 번호" },
+                    { name: "title", type: "String", key: "", constraints: "", desc: "원천 문서 제목" },
+                    { name: "documentType", type: "String", key: "", constraints: "", desc: "문서 성격 종류" },
+                    { name: "sourceUrl", type: "String", key: "", constraints: "", desc: "원본 문서 파일 URL" },
+                    { name: "data_source_id", type: "Long", key: "fk", constraints: "data_sources.id", desc: "기초 출처 정보" },
+                    { name: "content", type: "String (text)", key: "", constraints: "", desc: "문서 전체 원문 내용" }
+                ],
+                code: `@Entity\n@Table(name = "rag_documents")\npublic class RagDocument extends BaseEntity {\n    private String title;\n    private String documentType;\n    private String sourceUrl;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "data_source_id")\n    private DataSource dataSource;\n    @Column(columnDefinition = "text")\n    private String content;\n}`
+            },
+            {
+                id: "RAG-CHUNK",
+                name: "RagChunk",
+                dbName: "rag_chunks",
+                category: "rag",
+                desc: "원천 문서를 검색에 적합한 단위로 쪼갠 조각과 해당 조각의 임베딩 벡터입니다 (PGVector 연동).",
+                x: 4600, y: 550,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "청크 고유키" },
+                    { name: "document_id", type: "Long", key: "fk", constraints: "rag_documents.id", desc: "상위 문서 참조" },
+                    { name: "chunkIndex", type: "Integer", key: "", constraints: "", desc: "문서 내 청크 순서" },
+                    { name: "chunkText", type: "String (text)", key: "", constraints: "", desc: "분할된 텍스트 단락" },
+                    { name: "embedding", type: "String (vector(1536))", key: "", constraints: "", desc: "1536 차원의 벡터값" },
+                    { name: "admin_dong_id", type: "Long", key: "fk", constraints: "admin_dongs.id", desc: "메타: 연관 행정동 (선택)" },
+                    { name: "industry_id", type: "Long", key: "fk", constraints: "industries.id", desc: "메타: 연관 업종 (선택)" },
+                    { name: "brand_id", type: "Long", key: "fk", constraints: "franchise_brands.id", desc: "메타: 연관 브랜드 (선택)" }
+                ],
+                code: `@Entity\n@Table(name = "rag_chunks")\npublic class RagChunk extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "document_id")\n    private RagDocument document;\n    private Integer chunkIndex;\n    @Column(columnDefinition = "text")\n    private String chunkText;\n    @Column(columnDefinition = "vector(1536)")\n    private String embedding;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "admin_dong_id")\n    private AdminDong adminDong;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "industry_id")\n    private Industry industry;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "brand_id")\n    private FranchiseBrand brand;\n}`
+            },
+            {
+                id: "CHAT-SESSION",
+                name: "ChatSession",
+                dbName: "chat_sessions",
+                category: "rag",
+                desc: "사용자와 AI 에이전트 간의 1:1 대화방 세션 정보를 기록합니다.",
+                x: 5150, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "대화 세션 ID" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "대화 참가 사용자 참조" },
+                    { name: "title", type: "String", key: "", constraints: "", desc: "방 제목" },
+                    { name: "admin_dong_id", type: "Long", key: "fk", constraints: "admin_dongs.id", desc: "대화 포커스 행정동" },
+                    { name: "industry_id", type: "Long", key: "fk", constraints: "industries.id", desc: "대화 포커스 업종" },
+                    { name: "brand_id", type: "Long", key: "fk", constraints: "franchise_brands.id", desc: "대화 포커스 브랜드" }
+                ],
+                code: `@Entity\n@Table(name = "chat_sessions")\npublic class ChatSession extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    private String title;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "admin_dong_id")\n    private AdminDong adminDong;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "industry_id")\n    private Industry industry;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "brand_id")\n    private FranchiseBrand brand;\n}`
+            },
+            {
+                id: "CHAT-MESSAGE",
+                name: "ChatMessage",
+                dbName: "chat_messages",
+                category: "rag",
+                desc: "대화 세션의 상세 질의응답 메시지를 이력 관리합니다.",
+                x: 5150, y: 580,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "메시지 번호" },
+                    { name: "session_id", type: "Long", key: "fk", constraints: "chat_sessions.id", desc: "소속 대화 세션" },
+                    { name: "role", type: "MessageRole", key: "", constraints: "", desc: "발화 역할 (USER, ASSISTANT 등)" },
+                    { name: "content", type: "String (text)", key: "", constraints: "", desc: "메세지 본문" },
+                    { name: "metadataJson", type: "String (jsonb)", key: "", constraints: "", desc: "렌더링용 임시 메타 JSON" }
+                ],
+                code: `@Entity\n@Table(name = "chat_messages")\npublic class ChatMessage extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "session_id")\n    private ChatSession session;\n    @Enumerated(EnumType.STRING)\n    private MessageRole role;\n    @Column(columnDefinition = "text")\n    private String content;\n    @Column(columnDefinition = "jsonb")\n    private String metadataJson;\n}`
+            },
+            {
+                id: "AGENT-RUN",
+                name: "AgentRun",
+                dbName: "agent_runs",
+                category: "rag",
+                desc: "에이전트가 동작한 루프 단위 런(Run) 이력을 실행합니다.",
+                x: 5700, y: 150,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "실행 번호" },
+                    { name: "session_id", type: "Long", key: "fk", constraints: "chat_sessions.id", desc: "대화 세션 참조" },
+                    { name: "runId", type: "String", key: "", constraints: "", desc: "외부 LLM 에이전트 실행 런 ID" },
+                    { name: "status", type: "String", key: "", constraints: "", desc: "상태값" },
+                    { name: "startedAt", type: "LocalDateTime", key: "", constraints: "", desc: "실행 시작 시간" },
+                    { name: "endedAt", type: "LocalDateTime", key: "", constraints: "", desc: "실행 완료 시간" }
+                ],
+                code: `@Entity\n@Table(name = "agent_runs")\npublic class AgentRun extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "session_id")\n    private ChatSession session;\n    private String runId;\n    private String status;\n    private LocalDateTime startedAt;\n    private LocalDateTime endedAt;\n}`
+            },
+            {
+                id: "AGENT-TOOL-CALL",
+                name: "AgentToolCall",
+                dbName: "agent_tool_calls",
+                category: "rag",
+                desc: "에이전트가 답변 생성을 위해 수행한 도구 호출(Tool Call) 상세 정보입니다.",
+                x: 5700, y: 500,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 키" },
+                    { name: "agent_run_id", type: "Long", key: "fk", constraints: "agent_runs.id", desc: "소속 에이전트 Run 참조" },
+                    { name: "toolName", type: "String", key: "", constraints: "", desc: "호출 함수명" },
+                    { name: "status", type: "ToolCallStatus", key: "", constraints: "", desc: "호출 결과 상태" },
+                    { name: "requestJson", type: "String (jsonb)", key: "", constraints: "", desc: "인수값 파라미터 JSON" },
+                    { name: "responseJson", type: "String (jsonb)", key: "", constraints: "", desc: "실행 반환 결과 JSON" },
+                    { name: "hitlRequired", type: "Boolean", key: "", constraints: "", desc: "HITL (승인) 대기 필요 여부" }
+                ],
+                code: `@Entity\n@Table(name = "agent_tool_calls")\npublic class AgentToolCall extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "agent_run_id")\n    private AgentRun agentRun;\n    private String toolName;\n    @Enumerated(EnumType.STRING)\n    private ToolCallStatus status;\n    @Column(columnDefinition = "jsonb")\n    private String requestJson;\n    @Column(columnDefinition = "jsonb")\n    private String responseJson;\n    private Boolean hitlRequired;\n}`
+            },
+            {
+                id: "AGENT-EVAL-RESULT",
+                name: "AgentEvalResult",
+                dbName: "agent_eval_results",
+                category: "rag",
+                desc: "에이전트 응답 품질, RAG 정확도, Tool Call 평가 결과를 보관합니다.",
+                x: 5700, y: 900,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "scenarioName", type: "String", key: "", constraints: "", desc: "평가 시나리오 명칭" },
+                    { name: "targetTask", type: "String", key: "", constraints: "", desc: "평가 과업 명칭" },
+                    { name: "passed", type: "Boolean", key: "", constraints: "", desc: "평가 통과 여부" },
+                    { name: "score", type: "BigDecimal", key: "", constraints: "", desc: "평가 점수 (0.0~1.0)" },
+                    { name: "failureReason", type: "String (text)", key: "", constraints: "", desc: "탈락 시 사유" },
+                    { name: "detailJson", type: "String (jsonb)", key: "", constraints: "", desc: "상세 평가 지표 JSON" }
+                ],
+                code: `@Entity\n@Table(name = "agent_eval_results")\npublic class AgentEvalResult extends BaseEntity {\n    private String scenarioName;\n    private String targetTask;\n    private Boolean passed;\n    private BigDecimal score;\n    @Column(columnDefinition = "text")\n    private String failureReason;\n    @Column(columnDefinition = "jsonb")\n    private String detailJson;\n}`
+            },
+
+            // Category: report (4 tables)
+            {
+                id: "REPORT",
+                name: "Report",
+                dbName: "reports",
+                category: "report",
+                desc: "LLM을 이용하여 대화방 또는 추천 내역을 기반으로 자동 생성한 정식 상권분석 리포트입니다.",
+                x: 4600, y: 1100,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "리포트 ID" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "소유 사용자 참조" },
+                    { name: "recommendation_result_id", type: "Long", key: "fk", constraints: "recommendation_results.id", desc: "기반 추천 결과 (선택)" },
+                    { name: "chat_session_id", type: "Long", key: "fk", constraints: "chat_sessions.id", desc: "대화 기반 세션 참조 (선택)" },
+                    { name: "title", type: "String", key: "", constraints: "", desc: "리포트 제목" },
+                    { name: "status", type: "ReportStatus", key: "", constraints: "", desc: "비동기 생성 상태" },
+                    { name: "summary", type: "String (text)", key: "", constraints: "", desc: "리포트 요약 내용 본문" },
+                    { name: "fileUrl", type: "String", key: "", constraints: "", desc: "완본 PDF 다운로드 경로" }
+                ],
+                code: `@Entity\n@Table(name = "reports")\npublic class Report extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "recommendation_result_id")\n    private RecommendationResult recommendationResult;\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "chat_session_id")\n    private ChatSession chatSession;\n    private String title;\n    @Enumerated(EnumType.STRING)\n    private ReportStatus status;\n    @Column(columnDefinition = "text")\n    private String summary;\n    private String fileUrl;\n}`
+            },
+            {
+                id: "DOCUMENT",
+                name: "Document",
+                dbName: "documents",
+                category: "report",
+                desc: "창업 계획서, 메모장, 사업 생애주기 구상 기획 등 유저가 작성한 문서를 저장합니다.",
+                x: 5150, y: 1100,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "문서 ID" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "소유주 사용자 참조" },
+                    { name: "documentType", type: "DocumentType", key: "", constraints: "", desc: "구분 종류" },
+                    { name: "title", type: "String", key: "", constraints: "", desc: "문서 명칭" },
+                    { name: "content", type: "String (text)", key: "", constraints: "", desc: "문서 본문 내용" },
+                    { name: "fileUrl", type: "String", key: "", constraints: "", desc: "첨부 파일 경로" }
+                ],
+                code: `@Entity\n@Table(name = "documents")\npublic class Document extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    @Enumerated(EnumType.STRING)\n    private DocumentType documentType;\n    private String title;\n    @Column(columnDefinition = "text")\n    private String content;\n    private String fileUrl;\n}`
+            },
+            {
+                id: "DOCUMENT-TAG",
+                name: "DocumentTag",
+                dbName: "document_tags",
+                category: "report",
+                desc: "사용자 작성 문서의 탐색용 키워드 태그 리스트입니다.",
+                x: 5150, y: 1450,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "식별 번호" },
+                    { name: "document_id", type: "Long", key: "fk", constraints: "documents.id", desc: "대상 문서 참조" },
+                    { name: "tagName", type: "String", key: "", constraints: "", desc: "태그 키워드 명칭" }
+                ],
+                code: `@Entity\n@Table(name = "document_tags")\npublic class DocumentTag extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "document_id")\n    private Document document;\n    private String tagName;\n}`
+            },
+            {
+                id: "STARTUP-SCHEDULE-ITEM",
+                name: "StartupScheduleItem",
+                dbName: "startup_schedule_items",
+                category: "report",
+                desc: "창업 생애주기 및 할일(TODO) 일정 관리 항목을 제어합니다.",
+                x: 5700, y: 1200,
+                columns: [
+                    { name: "id", type: "Long", key: "pk", constraints: "NOT NULL", desc: "할일 ID" },
+                    { name: "user_id", type: "Long", key: "fk", constraints: "users.id", desc: "담당 사용자 참조" },
+                    { name: "title", type: "String", key: "", constraints: "", desc: "할일 제목" },
+                    { name: "description", type: "String (text)", key: "", constraints: "", desc: "할일 상세 요약" },
+                    { name: "dueDate", type: "LocalDate", key: "", constraints: "", desc: "완료 예정일" },
+                    { name: "completed", type: "Boolean", key: "", constraints: "DEFAULT = false", desc: "완료 여부" },
+                    { name: "category", type: "String", key: "", constraints: "", desc: "구분 카테고리" }
+                ],
+                code: `@Entity\n@Table(name = "startup_schedule_items")\npublic class StartupScheduleItem extends BaseEntity {\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n    private String title;\n    @Column(columnDefinition = "text")\n    private String description;\n    private LocalDate dueDate;\n    private Boolean completed = false;\n    private String category;\n}`
+            }
+        ];
+
+        // Database foreign key relations mapping definitions
+        const relationsData = [
+            { from: "USER", to: "OAUTH-ACCOUNT", label: "has" },
+            { from: "USER", to: "USER-PROFILE", label: "has" },
+            { from: "USER", to: "ONBOARDING-SESSION", label: "completes" },
+            { from: "ONBOARDING-SESSION", to: "ONBOARDING-ANSWER", label: "contains" },
+            { from: "ONBOARDING-QUESTION", to: "ONBOARDING-ANSWER", label: "answered_by" },
+
+            { from: "ADMIN-DONG", to: "COMMERCIAL-METRIC", label: "has" },
+            { from: "INDUSTRY", to: "COMMERCIAL-METRIC", label: "measured_by" },
+            { from: "METRIC-PERIOD", to: "COMMERCIAL-METRIC", label: "groups" },
+            { from: "DATA-SOURCE", to: "COMMERCIAL-METRIC", label: "provides" },
+
+            { from: "ADMIN-DONG", to: "FACILITY", label: "contains" },
+            { from: "ADMIN-DONG", to: "STORE", label: "contains" },
+            { from: "INDUSTRY", to: "STORE", label: "classifies" },
+
+            { from: "INDUSTRY", to: "FRANCHISE-BRAND", label: "includes" },
+            { from: "FRANCHISE-BRAND", to: "FRANCHISE-STARTUP-COST", label: "has" },
+            { from: "FRANCHISE-BRAND", to: "FRANCHISE-SALES-STAT", label: "has" },
+            { from: "METRIC-PERIOD", to: "FRANCHISE-SALES-STAT", label: "groups" },
+            { from: "FRANCHISE-BRAND", to: "FRANCHISE-DISCLOSURE", label: "has" },
+            { from: "DATA-SOURCE", to: "FRANCHISE-DISCLOSURE", label: "provides" },
+            { from: "FRANCHISE-BRAND", to: "FRANCHISE-POST", label: "has" },
+
+            { from: "USER", to: "RECOMMENDATION-REQUEST", label: "creates" },
+            { from: "RECOMMENDATION-REQUEST", to: "RECOMMENDATION-RESULT", label: "returns" },
+            { from: "ADMIN-DONG", to: "RECOMMENDATION-RESULT", label: "recommended_as" },
+            { from: "INDUSTRY", to: "RECOMMENDATION-RESULT", label: "recommended_as" },
+            { from: "FRANCHISE-BRAND", to: "RECOMMENDATION-RESULT", label: "recommended_as" },
+            { from: "RECOMMENDATION-RESULT", to: "RECOMMENDATION-SCORE-ITEM", label: "explains" },
+
+            { from: "ADMIN-DONG", to: "INDUSTRY-FIT-SCORE", label: "scored" },
+            { from: "INDUSTRY", to: "INDUSTRY-FIT-SCORE", label: "scored" },
+            { from: "METRIC-PERIOD", to: "INDUSTRY-FIT-SCORE", label: "groups" },
+            { from: "INDUSTRY", to: "INDUSTRY-WEIGHT-CONFIG", label: "configures" },
+
+            { from: "USER", to: "SAVED-RECOMMENDATION", label: "saves" },
+            { from: "RECOMMENDATION-RESULT", to: "SAVED-RECOMMENDATION", label: "saves" },
+            { from: "USER", to: "SAVED-ADMIN-DONG", label: "saves" },
+            { from: "ADMIN-DONG", to: "SAVED-ADMIN-DONG", label: "saves" },
+            { from: "USER", to: "SAVED-FRANCHISE-BRAND", label: "saves" },
+            { from: "FRANCHISE-BRAND", to: "SAVED-FRANCHISE-BRAND", label: "saves" },
+            { from: "USER", to: "USER-PREFERENCE-VECTOR", label: "has" },
+            { from: "USER", to: "USER-PREFERENCE-TAG", label: "has" },
+
+            { from: "DATA-SOURCE", to: "RAG-DOCUMENT", label: "provides" },
+            { from: "RAG-DOCUMENT", to: "RAG-CHUNK", label: "split_into" },
+            { from: "ADMIN-DONG", to: "RAG-CHUNK", label: "tags" },
+            { from: "INDUSTRY", to: "RAG-CHUNK", label: "tags" },
+            { from: "FRANCHISE-BRAND", to: "RAG-CHUNK", label: "tags" },
+
+            { from: "USER", to: "CHAT-SESSION", label: "starts" },
+            { from: "ADMIN-DONG", to: "CHAT-SESSION", label: "tags" },
+            { from: "INDUSTRY", to: "CHAT-SESSION", label: "tags" },
+            { from: "FRANCHISE-BRAND", to: "CHAT-SESSION", label: "tags" },
+            { from: "CHAT-SESSION", to: "CHAT-MESSAGE", label: "contains" },
+            { from: "CHAT-SESSION", to: "AGENT-RUN", label: "executes" },
+            { from: "AGENT-RUN", to: "AGENT-TOOL-CALL", label: "calls" },
+
+            { from: "USER", to: "REPORT", label: "creates" },
+            { from: "RECOMMENDATION-RESULT", to: "REPORT", label: "basis" },
+            { from: "CHAT-SESSION", to: "REPORT", label: "basis" },
+
+            { from: "USER", to: "DOCUMENT", label: "owns" },
+            { from: "DOCUMENT", to: "DOCUMENT-TAG", label: "has" },
+            { from: "USER", to: "STARTUP-SCHEDULE-ITEM", label: "manages" }
+        ];
+
+        // Global layout manipulation state
+        let zoom = 0.55;
+        let panX = 150;
+        let panY = 80;
+        let isDragging = false;
+        let startX, startY;
+        let showLines = true;
+        let selectedCardId = null;
+
+        const container = document.getElementById('canvas-container');
+        const content = document.getElementById('canvas-content');
+        const cardsArea = document.getElementById('cards-rendering-area');
+        const relationsSvg = document.getElementById('relations-svg');
+        const searchBox = document.getElementById('search-box');
+
+        // Dynamic rendering of cards
+        function renderTableCards() {
+            cardsArea.innerHTML = '';
+            tablesData.forEach(table => {
+                const card = document.createElement('div');
+                card.className = `table-card`;
+                card.id = table.id;
+                card.style.left = `${table.x}px`;
+                card.style.top = `${table.y}px`;
+                card.setAttribute('data-category', table.category);
+                card.setAttribute('onclick', `selectCard('${table.id}', event)`);
+
+                // Create header
+                const catColorClass = `color-${table.category}`;
+                let columnsHtml = '';
+                
+                table.columns.forEach(col => {
+                    let keyBadge = '';
+                    if (col.key === 'pk') keyBadge = `<span class="card-key-icon card-pk">PK</span>`;
+                    else if (col.key === 'fk') keyBadge = `<span class="card-key-icon card-fk" title="FK to ${col.constraints}">FK</span>`;
+                    else if (col.key === 'unique') keyBadge = `<span class="card-key-icon card-unique">U</span>`;
+
+                    columnsHtml += `
+                        <div class="card-column-row">
+                            <div class="card-col-left">
+                                ${keyBadge}
+                                <span class="card-col-name">${col.name}</span>
+                            </div>
+                            <span class="card-col-type">${col.type}</span>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="card-category-indicator ${catColorClass}"></div>
+                    <div class="card-header">
+                        <span class="card-title-java">${table.name}</span>
+                        <span class="card-title-db">${table.dbName}</span>
+                    </div>
+                    <div class="card-columns-list">
+                        ${columnsHtml}
+                    </div>
+                `;
+
+                cardsArea.appendChild(card);
+            });
+        }
+
+        // Draw relationship lines via SVG
+        function drawRelations() {
+            relationsSvg.innerHTML = `
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#818cf8"/>
+                    </marker>
+                    <marker id="circle" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <circle cx="5" cy="5" r="3" fill="#ffffff" stroke="#818cf8" stroke-width="2"/>
+                    </marker>
+                </defs>
+            `;
+
+            if (!showLines) return;
+
+            relationsData.forEach(rel => {
+                const src = document.getElementById(rel.from);
+                const dest = document.getElementById(rel.to);
+                if (!src || !dest) return;
+
+                const x1 = src.offsetLeft;
+                const y1 = src.offsetTop;
+                const w1 = src.offsetWidth;
+                const h1 = src.offsetHeight;
+
+                const x2 = dest.offsetLeft;
+                const y2 = dest.offsetTop;
+                const w2 = dest.offsetWidth;
+                const h2 = dest.offsetHeight;
+
+                let p1 = { x: 0, y: 0 };
+                let p2 = { x: 0, y: 0 };
+                let dir = 'h';
+
+                // Connecting edge estimation heuristics
+                if (x1 + w1 + 100 < x2) {
+                    p1 = { x: x1 + w1, y: y1 + h1 / 2 };
+                    p2 = { x: x2, y: y2 + h2 / 2 };
+                    dir = 'h';
+                } else if (x2 + w2 + 100 < x1) {
+                    p1 = { x: x1, y: y1 + h1 / 2 };
+                    p2 = { x: x2 + w2, y: y2 + h2 / 2 };
+                    dir = 'h';
+                } else if (y1 + h1 + 60 < y2) {
+                    p1 = { x: x1 + w1 / 2, y: y1 + h1 };
+                    p2 = { x: x2 + w2 / 2, y: y2 };
+                    dir = 'v';
+                } else {
+                    p1 = { x: x1 + w1 / 2, y: y1 };
+                    p2 = { x: x2 + w2 / 2, y: y2 + h2 };
+                    dir = 'v';
+                }
+
+                let d = '';
+                if (dir === 'h') {
+                    const offset = Math.min(180, Math.abs(p2.x - p1.x) * 0.45);
+                    d = `M ${p1.x} ${p1.y} C ${p1.x + offset} ${p1.y}, ${p2.x - offset} ${p2.y}, ${p2.x} ${p2.y}`;
+                } else {
+                    const offset = Math.min(120, Math.abs(p2.y - p1.y) * 0.45);
+                    d = `M ${p1.x} ${p1.y} C ${p1.x} ${p1.y + offset}, ${p2.x} ${p2.y - offset}, ${p2.x} ${p2.y}`;
+                }
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', d);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('class', `connection-line rel-from-${rel.from} rel-to-${rel.to}`);
+                path.setAttribute('marker-start', 'url(#circle)');
+                path.setAttribute('marker-end', 'url(#arrow)');
+                path.setAttribute('onclick', `highlightLineRelation('${rel.from}', '${rel.to}', event)`);
+
+                relationsSvg.appendChild(path);
+            });
+        }
+
+        // Initialize Canvas Zoom & Pan handlers
+        function setupCanvasHandlers() {
+            container.addEventListener('mousedown', (e) => {
+                if (e.target === container || e.target === relationsSvg) {
+                    isDragging = true;
+                    startX = e.clientX - panX;
+                    startY = e.clientY - panY;
+                    container.style.cursor = 'grabbing';
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    panX = e.clientX - startX;
+                    panY = e.clientY - startY;
+                    updateTransform();
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                container.style.cursor = 'grab';
+            });
+
+            // Wheel zoom
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = 1.08;
+                const rect = container.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const canvasX = (mouseX - panX) / zoom;
+                const canvasY = (mouseY - panY) / zoom;
+                
+                if (e.deltaY < 0) {
+                    zoom = Math.min(2.0, zoom * zoomFactor);
+                } else {
+                    zoom = Math.max(0.1, zoom / zoomFactor);
+                }
+                
+                panX = mouseX - canvasX * zoom;
+                panY = mouseY - canvasY * zoom;
+                
+                updateTransform();
+            }, { passive: false });
+        }
+
+        function updateTransform() {
+            content.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+            document.getElementById('zoom-text').textContent = `${Math.round(zoom * 100)}%`;
+        }
+
+        // Zoom button helpers
+        function zoomCanvas(factor) {
+            const rect = container.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const canvasX = (centerX - panX) / zoom;
+            const canvasY = (centerY - panY) / zoom;
+
+            zoom = Math.max(0.1, Math.min(2.0, zoom * factor));
+            panX = centerX - canvasX * zoom;
+            panY = centerY - canvasY * zoom;
+            updateTransform();
+        }
+
+        // Fit all cards to viewport
+        function fitToScreen() {
+            let minX = Infinity, minY = Infinity;
+            let maxX = -Infinity, maxY = -Infinity;
+            
+            tablesData.forEach(t => {
+                minX = Math.min(minX, t.x);
+                minY = Math.min(minY, t.y);
+                maxX = Math.max(maxX, t.x + 280);
+                maxY = Math.max(maxY, t.y + 250);
+            });
+
+            const w = maxX - minX;
+            const h = maxY - minY;
+            
+            const rect = container.getBoundingClientRect();
+            
+            const zoomX = (rect.width - 100) / w;
+            const zoomY = (rect.height - 100) / h;
+            zoom = Math.max(0.12, Math.min(1.0, Math.min(zoomX, zoomY)));
+            
+            panX = (rect.width - w * zoom) / 2 - minX * zoom;
+            panY = (rect.height - h * zoom) / 2 - minY * zoom;
+            
+            updateTransform();
+        }
+
+        function resetZoomAndCenter() {
+            zoom = 0.55;
+            panX = 150;
+            panY = 80;
+            updateTransform();
+        }
+
+        function toggleLines() {
+            showLines = !showLines;
+            drawRelations();
+        }
+
+        // Card Selection and Inspector update
+        function selectCard(tableId, event) {
+            if (event) event.stopPropagation();
+            
+            selectedCardId = tableId;
+            
+            // Highlight card visual indicator
+            document.querySelectorAll('.table-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            const cardEl = document.getElementById(tableId);
+            if (cardEl) cardEl.classList.add('selected');
+
+            // Find table object data
+            const table = tablesData.find(t => t.id === tableId);
+            if (!table) return;
+
+            // Load to right panel inspector
+            const panel = document.getElementById('inspector-panel');
+            panel.classList.add('open');
+
+            // Category tag mapping styling
+            const inspectTag = document.getElementById('inspect-tag');
+            inspectTag.textContent = getCategoryName(table.category);
+            inspectTag.className = `domain-tag tag-${table.category}`;
+
+            document.getElementById('inspect-java-name').textContent = table.name;
+            document.getElementById('inspect-db-name').textContent = table.dbName;
+            document.getElementById('inspect-desc').textContent = table.desc;
+
+            // Build columns body rows
+            let columnsBodyHtml = '';
+            table.columns.forEach(col => {
+                let badge = '';
+                if (col.key === 'pk') badge = `<span class="card-key-icon card-pk">PK</span> `;
+                else if (col.key === 'fk') badge = `<span class="card-key-icon card-fk">FK</span> `;
+                else if (col.key === 'unique') badge = `<span class="card-key-icon card-unique">U</span> `;
+
+                columnsBodyHtml += `
+                    <tr>
+                        <td><span class="detail-col-name">${badge}${col.name}</span></td>
+                        <td><span class="detail-col-type">${col.type}</span></td>
+                        <td>
+                            <div style="font-weight:600; color:var(--rose); font-size:0.75rem;">${col.constraints}</div>
+                            <div style="color:var(--text-secondary); margin-top:0.1rem;">${col.desc}</div>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('inspect-columns-body').innerHTML = columnsBodyHtml;
+
+            // Relations matching list
+            let relationsHtml = '';
+            const connectedRelations = relationsData.filter(r => r.from === tableId || r.to === tableId);
+            
+            if (connectedRelations.length > 0) {
+                connectedRelations.forEach(rel => {
+                    const isFrom = rel.from === tableId;
+                    const counterpart = isFrom ? rel.to : rel.from;
+                    const counterpartTable = tablesData.find(t => t.id === counterpart);
+                    const counterpartName = counterpartTable ? counterpartTable.name : counterpart;
+                    
+                    if (isFrom) {
+                        relationsHtml += `
+                            <div>
+                                <span class="rel-link" onclick="focusAndFlashCard('${counterpart}')">${counterpartName}</span>
+                                (1 : N 참조 대상)
+                            </div>
+                        `;
+                    } else {
+                        relationsHtml += `
+                            <div>
+                                참조주체: 
+                                <span class="rel-link" onclick="focusAndFlashCard('${counterpart}')">${counterpartName}</span>
+                            </div>
+                        `;
+                    }
+                });
+            } else {
+                relationsHtml = '<div>연관 관계선이 없습니다.</div>';
+            }
+            document.getElementById('inspect-relations-body').innerHTML = relationsHtml;
+
+            // Code snippet highlight
+            document.getElementById('inspect-code').innerHTML = formatJavaSyntax(table.code);
+
+            // Highlight connections for selected table
+            highlightTableConnections(tableId);
+        }
+
+        // Highlight SVG lines linked to selected card
+        function highlightTableConnections(tableId) {
+            document.querySelectorAll('.connection-line').forEach(line => {
+                line.classList.remove('highlight', 'dimmed');
+                if (tableId) {
+                    const isSource = line.classList.contains(`rel-from-${tableId}`);
+                    const isTarget = line.classList.contains(`rel-to-${tableId}`);
+                    
+                    if (isSource || isTarget) {
+                        line.classList.add('highlight');
+                    } else {
+                        line.classList.add('dimmed');
+                    }
+                }
+            });
+
+            // Dim unrelated table cards
+            document.querySelectorAll('.table-card').forEach(card => {
+                card.classList.remove('dimmed');
+                if (tableId) {
+                    const cardId = card.id;
+                    const isConnected = cardId === tableId || 
+                        relationsData.some(r => (r.from === tableId && r.to === cardId) || (r.to === tableId && r.from === cardId));
+                    
+                    if (!isConnected) {
+                        card.classList.add('dimmed');
+                    }
+                }
+            });
+        }
+
+        // Smooth slide close right panel inspector
+        function closeInspector() {
+            document.getElementById('inspector-panel').classList.remove('open');
+            selectedCardId = null;
+            // Clear highlights
+            document.querySelectorAll('.connection-line').forEach(line => line.classList.remove('highlight', 'dimmed'));
+            document.querySelectorAll('.table-card').forEach(card => {
+                card.classList.remove('dimmed', 'selected');
+            });
+        }
+
+        // Categories mapping names
+        function getCategoryName(cat) {
+            switch(cat) {
+                case 'auth': return '사용자 / 인증 / 온보딩';
+                case 'dong': return '행정동 / 상권 / 기초';
+                case 'brand': return '프랜차이즈 브랜드';
+                case 'recommend': return '추천 / 점수 산정';
+                case 'saved': return '저장 관심 / 임베딩';
+                case 'rag': return 'AI / RAG / 채팅';
+                case 'report': return '리포트 / 문서 / 일정';
+                default: return '도메인';
+            }
+        }
+
+        // Color coding highlighting categories logic
+        function filterCategory(cat, navItem) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            navItem.classList.add('active');
+
+            if (cat === 'all') {
+                document.querySelectorAll('.table-card').forEach(card => {
+                    card.classList.remove('dimmed');
+                });
+                document.querySelectorAll('.connection-line').forEach(line => {
+                    line.classList.remove('dimmed', 'highlight');
+                });
+                fitToScreen();
+                return;
+            }
+
+            document.querySelectorAll('.table-card').forEach(card => {
+                if (card.getAttribute('data-category') === cat) {
+                    card.classList.remove('dimmed');
+                } else {
+                    card.classList.add('dimmed');
+                }
+            });
+
+            // Dim lines that are not part of the active category
+            document.querySelectorAll('.connection-line').forEach(line => {
+                line.classList.remove('highlight');
+                let matchesCategory = false;
+                
+                relationsData.forEach(rel => {
+                    if (line.classList.contains(`rel-from-${rel.from}`) && line.classList.contains(`rel-to-${rel.to}`)) {
+                        const fromTable = tablesData.find(t => t.id === rel.from);
+                        const toTable = tablesData.find(t => t.id === rel.to);
+                        if (fromTable?.category === cat && toTable?.category === cat) {
+                            matchesCategory = true;
+                        }
+                    }
+                });
+
+                if (matchesCategory) {
+                    line.classList.remove('dimmed');
+                } else {
+                    line.classList.add('dimmed');
+                }
+            });
+
+            // Pan/Zoom to category cluster
+            focusCategoryCluster(cat);
+        }
+
+        function focusCategoryCluster(cat) {
+            const catTables = tablesData.filter(t => t.category === cat);
+            if (catTables.length === 0) return;
+
+            let minX = Infinity, minY = Infinity;
+            let maxX = -Infinity, maxY = -Infinity;
+
+            catTables.forEach(t => {
+                minX = Math.min(minX, t.x);
+                minY = Math.min(minY, t.y);
+                maxX = Math.max(maxX, t.x + 280);
+                maxY = Math.max(maxY, t.y + 250);
+            });
+
+            const w = maxX - minX;
+            const h = maxY - minY;
+            const rect = container.getBoundingClientRect();
+            
+            zoom = Math.max(0.25, Math.min(1.0, Math.min((rect.width - 200) / w, (rect.height - 200) / h)));
+            panX = (rect.width - w * zoom) / 2 - minX * zoom;
+            panY = (rect.height - h * zoom) / 2 - minY * zoom;
+            updateTransform();
+        }
+
+        // Focus and trigger CSS scale flash on a target table card
+        function focusAndFlashCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+
+            // Reveal all category cards if the target was dimmed
+            document.querySelectorAll('.table-card').forEach(c => c.classList.remove('dimmed'));
+            document.querySelectorAll('.connection-line').forEach(l => l.classList.remove('dimmed'));
+
+            // Set coordinates to center
+            const rect = container.getBoundingClientRect();
+            const cardX = card.offsetLeft;
+            const cardY = card.offsetTop;
+            const cardW = card.offsetWidth;
+            const cardH = card.offsetHeight;
+
+            zoom = 0.85; // Set zoom to close focus
+            panX = rect.width / 2 - (cardX + cardW / 2) * zoom;
+            panY = rect.height / 2 - (cardY + cardH / 2) * zoom;
+            updateTransform();
+
+            // Trigger inspector card select
+            selectCard(cardId);
+
+            // Add CSS animation flash class
+            card.classList.remove('flash-card');
+            void card.offsetWidth; // Trigger reflow to restart animation
+            card.classList.add('flash-card');
+            setTimeout(() => card.classList.remove('flash-card'), 2000);
+        }
+
+        // SVG lines connection mouse click action
+        function highlightLineRelation(from, to, event) {
+            event.stopPropagation();
+            closeInspector();
+            
+            document.querySelectorAll('.connection-line').forEach(line => {
+                line.classList.remove('highlight', 'dimmed');
+                if (line.classList.contains(`rel-from-${from}`) && line.classList.contains(`rel-to-${to}`)) {
+                    line.classList.add('highlight');
+                } else {
+                    line.classList.add('dimmed');
+                }
+            });
+
+            document.querySelectorAll('.table-card').forEach(card => {
+                if (card.id === from || card.id === to) {
+                    card.classList.remove('dimmed');
+                    card.classList.add('selected');
+                } else {
+                    card.classList.add('dimmed');
+                    card.classList.remove('selected');
+                }
+            });
+        }
+
+        // Search bar match algorithm
+        searchBox.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (query === '') {
+                document.querySelectorAll('.table-card').forEach(card => {
+                    card.classList.remove('highlight-search', 'dimmed');
+                });
+                return;
+            }
+
+            let firstMatchedCard = null;
+
+            tablesData.forEach(table => {
+                const card = document.getElementById(table.id);
+                if (!card) return;
+
+                const javaMatch = table.name.toLowerCase().includes(query);
+                const dbMatch = table.dbName.toLowerCase().includes(query);
+                const descMatch = table.desc.toLowerCase().includes(query);
+                
+                let colMatch = false;
+                table.columns.forEach(col => {
+                    if (col.name.toLowerCase().includes(query) || col.desc.toLowerCase().includes(query)) {
+                        colMatch = true;
+                    }
+                });
+
+                if (javaMatch || dbMatch || descMatch || colMatch) {
+                    card.classList.add('highlight-search');
+                    card.classList.remove('dimmed');
+                    if (!firstMatchedCard) firstMatchedCard = table.id;
+                } else {
+                    card.classList.remove('highlight-search');
+                    card.classList.add('dimmed');
+                }
+            });
+
+            // Focus on first match
+            if (firstMatchedCard) {
+                focusAndFlashCard(firstMatchedCard);
+            }
+        });
+
+        // Simple syntax highlighter for JPA Entity preview block code
+        function formatJavaSyntax(code) {
+            if (!code) return '';
+            return code
+                .replace(/(@[A-Za-z0-9_]+(\(.*?\))?)/g, '<span class="annotation">$1</span>')
+                .replace(/\b(public|class|extends|private|String|Long|Integer|BigDecimal|Boolean|LocalDateTime|LocalDate|enum|void|PrePersist|PreUpdate)\b/g, '<span class="keyword">$1</span>')
+                .replace(/(".*?")/g, '<span class="string">$1</span>');
+        }
+
+        // Initialize UI numbers for badges
+        function initBadges() {
+            document.getElementById('badge-all').textContent = tablesData.length;
+            document.getElementById('badge-auth').textContent = tablesData.filter(t => t.category === 'auth').length;
+            document.getElementById('badge-dong').textContent = tablesData.filter(t => t.category === 'dong').length;
+            document.getElementById('badge-brand').textContent = tablesData.filter(t => t.category === 'brand').length;
+            document.getElementById('badge-recommend').textContent = tablesData.filter(t => t.category === 'recommend').length;
+            document.getElementById('badge-saved').textContent = tablesData.filter(t => t.category === 'saved').length;
+            document.getElementById('badge-rag').textContent = tablesData.filter(t => t.category === 'rag').length;
+            document.getElementById('badge-report').textContent = tablesData.filter(t => t.category === 'report').length;
+        }
+
+        // Window startup
+        window.addEventListener('load', () => {
+            renderTableCards();
+            setTimeout(() => {
+                drawRelations();
+                setupCanvasHandlers();
+                initBadges();
+                fitToScreen(); // Fit entire screen layout
+            }, 100);
+        });
+
+        // Re-align lines if window dimensions shift
+        window.addEventListener('resize', () => {
+            drawRelations();
+        });
+    </script>
+</body>
+</html>
