@@ -1,6 +1,17 @@
 # 7 ERD
+
 현재의 ERD는 프로젝트 요구사항에 맞춘 정규화된 ERD이며,
 공공데이터 양식에 맞추어 칼럼을 추가/수정할 수 있다.
+
+## ERD 상세 이미지
+
+다음은 설계된 데이터베이스의 테이블 상세 구조 및 관계도를 시각화한 ERD 캡처 이미지입니다.
+
+![ERD 상세 이미지 1](assets/erd/화면%20캡처%202026-06-17%20140735.png)
+![ERD 상세 이미지 2](assets/erd/화면%20캡처%202026-06-17%20140753.png)
+![ERD 상세 이미지 3](assets/erd/화면%20캡처%202026-06-17%20140809.png)
+![ERD 상세 이미지 4](assets/erd/화면%20캡처%202026-06-17%20140829.png)
+
 
 ## 0. 공통 Base / Enum
 
@@ -1119,3 +1130,7 @@ erDiagram
     DOCUMENT ||--o{ DOCUMENT_TAG : has
     USER ||--o{ STARTUP_SCHEDULE_ITEM : manages
 ```
+
+---
+
+
